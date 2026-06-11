@@ -25,7 +25,6 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category();
         category.setName(categoryRequest.name());
         category.setDescription(categoryRequest.description());
-        category.setActive(categoryRequest.isActive());
 
         return category;
     }
@@ -35,8 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
         return new CategoryResponse(
                 category.getId(),
                 category.getName(),
-                category.getDescription(),
-                category.isActive()
+                category.getDescription()
         );
     }
 
@@ -80,9 +78,6 @@ public class CategoryServiceImpl implements CategoryService {
             existingCategory.setName(updateCategoryrequest.name());
         if(updateCategoryrequest.description() != null)
             existingCategory.setDescription(updateCategoryrequest.description());
-        if(updateCategoryrequest.isActive() != null)
-            existingCategory.setActive(updateCategoryrequest.isActive());
-
         // update category
         categoryRepository.UpdateCategory(existingCategory);
         return mapToCategoryResponse(existingCategory);

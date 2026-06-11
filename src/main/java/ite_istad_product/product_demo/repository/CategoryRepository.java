@@ -11,12 +11,13 @@ import java.util.NoSuchElementException;
 public class CategoryRepository {
 
     // បង្កើតទិន្នន័យសិប្បនិម្មិត (Mock Data)
-    private final List<Category> categoryList = new ArrayList<>(){{
-        add(new Category(1, "Food", "ម្ហូបអាហារ", true));
-        add(new Category(2, "Beverage", "ភេសជ្ជៈគ្រប់ប្រភេទ", true));
-        add(new Category(3, "Snack", "ចំណីសម្រន់", true));
-        add(new Category(4, "Electronic", "គ្រឿងអេឡិចត្រូនិក", false));
-    }};
+    private final List<Category> categoryList = new ArrayList<>();
+//    {{
+//        add(new Category(1, "Food", "ម្ហូបអាហារ", true));
+//        add(new Category(2, "Beverage", "ភេសជ្ជៈគ្រប់ប្រភេទ", true));
+//        add(new Category(3, "Snack", "ចំណីសម្រន់", true));
+//        add(new Category(4, "Electronic", "គ្រឿងអេឡិចត្រូនិក", false));
+//    }};
 
     // ទាញយក Category ទាំងអស់
     public List<Category> getCategorieslist() {
