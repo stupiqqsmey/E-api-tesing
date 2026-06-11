@@ -31,7 +31,7 @@ dependencies {
 	// Source: https://mvnrepository.com/artifact/org.mapstruct/mapstruct
 	// implementation 'org.mapstruct:mapstruct:1.7.0.Beta1'
 	implementation 'org.mapstruct:mapstruct:1.6.3'
-	annotationProcessor 'org.mapstruct:mapstruct:1.6.3'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

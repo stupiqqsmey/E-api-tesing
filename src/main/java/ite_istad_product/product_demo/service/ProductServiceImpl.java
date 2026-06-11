@@ -4,6 +4,7 @@ import ite_istad_product.product_demo.dto.ProductRequest;
 import ite_istad_product.product_demo.dto.UpdateProductRequest;
 import ite_istad_product.product_demo.dto.ProductResponse;
 import ite_istad_product.product_demo.entity.Product;
+import ite_istad_product.product_demo.mapper.ProductMapper;
 import ite_istad_product.product_demo.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
     ///  inject product hare
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
     private Integer nextId = 1004;
 
     /// map to entity
@@ -51,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> findAllProducts() {
         return productRepository.getProductslist()
                 .stream()
-                .map(this::mapToProductResponse)
+                .map(productMapper::toProductResponse)
                 .toList();    }
 
     @Override

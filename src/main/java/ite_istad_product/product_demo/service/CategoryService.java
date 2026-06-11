@@ -11,7 +11,8 @@ import java.util.List;
 public interface CategoryService {
     CategoryResponse createCategory(CategoryRequest request);
     List<CategoryResponse> findAllCategories();
+    List<CategoryResponse> findByName(String name);
     CategoryResponse findCategoryById(Integer id);
     CategoryResponse updateCategory(Integer id, UpdateCategoryRequest updateCategoryrequest);
-    boolean deleteCategory(int id);
+    void deleteCategory(Integer id);
 }

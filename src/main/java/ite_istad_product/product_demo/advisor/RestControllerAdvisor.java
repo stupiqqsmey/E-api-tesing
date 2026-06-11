@@ -16,6 +16,17 @@ import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class RestControllerAdvisor {
+   @ExceptionHandler(ResourceAlreadyExistException.class)
+    public ResponseEntity<ErrorResponse<?>> handleResourceAlreadyExistException( ResourceAlreadyExistException ex) {
+        var response = ErrorResponse.builder()
+                        .message(ex.getMessage())
+                        .timeStamp(LocalDateTime.now())
+                        .status(HttpStatus.CONTINUE.value())
+                        .build();
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+    // handle not found issue
+    // ExceptionHandler(NoSuchElementException.class)
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ErrorResponse<?>> handleNoSuchElementException(NoSuchElementException ex) {
         return new ResponseEntity<>(
