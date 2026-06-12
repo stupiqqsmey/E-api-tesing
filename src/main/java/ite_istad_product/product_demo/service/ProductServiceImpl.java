@@ -8,86 +8,81 @@ import ite_istad_product.product_demo.mapper.ProductMapper;
 import ite_istad_product.product_demo.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-
 public class ProductServiceImpl implements ProductService {
-    ///  inject product hare
+
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
-    private Integer nextId = 1004;
-
-    /// map to entity
-    private Product mapToProduct(ProductRequest productRequest) {
-        Product product = new Product();
-        product.setName(productRequest.name());
-        product.setDescription(productRequest.description());
-        product.setPrice(productRequest.price());
-
-        return product;
-    }
-    /// maptoToresponse -> convert to Entity
-
-    private ProductResponse mapToProductResponse(Product product) {
-        return new ProductResponse(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice()
-        );
-    }
 
     @Override
+    @Transactional
     public ProductResponse createProduct(ProductRequest productrequest) {
-        var product = mapToProduct(productrequest);
-        product.getUserId();
-        product.setId(nextId++);
-        return mapToProductResponse(product);
+        Product product = productMapper.toEntity(productrequest);
+        product.setUserId(1);
+        Product savedProduct = productRepository.save(product);
+
+        return productMapper.toProductResponse(savedProduct);
     }
 
     @Override
-    public List<ProductResponse> findAllProducts() {
-        return productRepository.getProductslist()
-                .stream()
-                .map(productMapper::toProductResponse)
-                .toList();    }
+    @Transactional(readOnly = true)
+    public Page<ProductResponse> findAllProducts(int page, int size, String keyword) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> productPage;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            productPage = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        } else {
+            productPage = productRepository.findAll(pageable);
+        }
+
+        return productPage.map(productMapper::toProductResponse);
+    }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductResponse findProductById(Integer id) {
-        var product =   productRepository.findProductById(id);
+        Product product = productRepository.findById(id).orElse(null);
         if(product == null) {
-            // throw not found exception, but skip it for now
             log.info("Product with id {} not found", id);
             return null;
         }
-        return mapToProductResponse(product);    }
-
-    @Override
-    public ProductResponse updateProduct(Integer id, UpdateProductRequest updateProductrequest) {
-        var existingProduct = productRepository.findProductById(id);
-        if(existingProduct == null) {
-            log.info("No product found with id " + id);
-            // throw exception
-            return null;
-        }
-        if(updateProductrequest.name()!=null)
-            existingProduct.setName(updateProductrequest.name());
-        if(updateProductrequest.description()!=null)
-            existingProduct.setDescription(updateProductrequest.description());
-        if(updateProductrequest.price()!=null)
-            existingProduct.setPrice(updateProductrequest.price());
-        // update product
-        productRepository.UpdateProduct(existingProduct);
-        return mapToProductResponse(existingProduct);
-
+        return productMapper.toProductResponse(product);
     }
 
     @Override
-    public boolean deleteProduct(int id) {
+    @Transactional
+    public ProductResponse updateProduct(Integer id, UpdateProductRequest updateProductrequest) {
+        Product existingProduct = productRepository.findById(id).orElse(null);
+        if(existingProduct == null) {
+            log.info("No product found with id " + id);
+            return null;
+        }
+
+        if(updateProductrequest.name() != null)
+            existingProduct.setName(updateProductrequest.name());
+        if(updateProductrequest.description() != null)
+            existingProduct.setDescription(updateProductrequest.description());
+        if(updateProductrequest.price() != null)
+            existingProduct.setPrice(updateProductrequest.price());
+        Product updatedProduct = productRepository.save(existingProduct);
+        return productMapper.toProductResponse(updatedProduct);
+    }
+
+    @Override
+    @Transactional
+    public Boolean deleteProduct(Integer id) {
+        if(productRepository.existsById(id)) {
+            productRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 }

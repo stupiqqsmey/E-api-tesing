@@ -3,27 +3,23 @@ package ite_istad_product.product_demo.restcontroller;
 import ite_istad_product.product_demo.dto.CategoryRequest;
 import ite_istad_product.product_demo.dto.CategoryResponse;
 import ite_istad_product.product_demo.dto.UpdateCategoryRequest;
-import ite_istad_product.product_demo.repository.CategoryRepository;
 import ite_istad_product.product_demo.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
-
-    private final CategoryRepository categoryRepository;
     private final CategoryService categoryService;
-
-    /// inject method
-
     @GetMapping
-    public List<CategoryResponse> getCategories() {
-        return categoryService.findAllCategories();
+    public Page<CategoryResponse> getCategories(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return categoryService.findAllCategories(page, size);
     }
 
     @GetMapping("/{id}")
@@ -37,7 +33,14 @@ public class CategoryController {
     }
 
     @PatchMapping("/{id}")
-    public CategoryResponse updateCategory(@PathVariable Integer id, @RequestBody UpdateCategoryRequest request) {
+    public CategoryResponse updateCategory(
+            @PathVariable Integer id,
+            @RequestBody UpdateCategoryRequest request) {
         return categoryService.updateCategory(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCategory(@PathVariable Integer id) {
+        categoryService.deleteCategory(id);
     }
 }
