@@ -13,11 +13,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/products")
 public class ProductRestController {
-
-    // យើង Inject តែ Service បានហើយ (លុប Repository ចេញព្រោះ Controller មិនគួរហៅ Repository ផ្ទាល់ទេ)
     private final ProductService productService;
 
-    // ១. កែប្រែពី List ទៅ Page និងបន្ថែម @RequestParam សម្រាប់ Page, Size និង Keyword
     @GetMapping
     public Page<ProductResponse> getProducts(
             @RequestParam(defaultValue = "0") int page,
@@ -44,7 +41,6 @@ public class ProductRestController {
         return productService.updateProduct(id, request);
     }
 
-    // ២. បន្ថែម API សម្រាប់ធ្វើការលុប (Delete)
     @DeleteMapping("/{id}")
     public Boolean deleteProduct(@PathVariable Integer id) {
         return productService.deleteProduct(id);
