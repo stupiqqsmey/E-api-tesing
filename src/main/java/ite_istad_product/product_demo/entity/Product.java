@@ -24,7 +24,7 @@ public class Product {
     private Double price;
     private Integer userId;
 
-    @ManyToOne (fetch = FetchType.LAZY)
+    @ManyToOne (fetch = FetchType.LAZY)  /// many to one is eiger
     @JoinColumn(name = "category_id")
     private Category category;
 }

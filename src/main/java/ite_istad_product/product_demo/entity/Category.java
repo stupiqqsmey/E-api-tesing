@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,6 +22,15 @@ public class Category {
     private Integer id;
     private String name;
     private String description;
-    @OneToMany(mappedBy = "category")
-    private List<Product> products;
+    private Boolean isDeleted= false;
+
+    private String icon; /// store url icon
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_category_id")
+    private Category parentCategory;
+
+    @OneToMany(mappedBy = "parentCategory")
+    private List<Category> children = new ArrayList<>();
+
 }
