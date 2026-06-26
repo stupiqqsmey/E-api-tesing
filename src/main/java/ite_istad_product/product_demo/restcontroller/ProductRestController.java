@@ -1,8 +1,8 @@
 package ite_istad_product.product_demo.restcontroller;
 
-import ite_istad_product.product_demo.dto.ProductRequest;
-import ite_istad_product.product_demo.dto.ProductResponse;
-import ite_istad_product.product_demo.dto.UpdateProductRequest;
+import ite_istad_product.product_demo.dto.product.ProductRequest;
+import ite_istad_product.product_demo.dto.product.ProductResponse;
+import ite_istad_product.product_demo.dto.product.UpdateProductRequest;
 import ite_istad_product.product_demo.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

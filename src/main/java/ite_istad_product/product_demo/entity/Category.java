@@ -31,6 +31,6 @@ public class Category {
     private Category parentCategory;
 
     @OneToMany(mappedBy = "parentCategory")
-    private List<Category> children = new ArrayList<>();
+    private List<Category> subcategory = new ArrayList<>();
 
 }

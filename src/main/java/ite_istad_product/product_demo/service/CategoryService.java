@@ -1,8 +1,8 @@
 package ite_istad_product.product_demo.service;
 
-import ite_istad_product.product_demo.dto.CategoryRequest;
-import ite_istad_product.product_demo.dto.UpdateCategoryRequest;
-import ite_istad_product.product_demo.dto.CategoryResponse;
+import ite_istad_product.product_demo.dto.category.CategoryRequest;
+import ite_istad_product.product_demo.dto.category.UpdateCategoryRequest;
+import ite_istad_product.product_demo.dto.category.CategoryResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 

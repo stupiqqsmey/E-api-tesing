@@ -1,9 +1,9 @@
 package ite_istad_product.product_demo.service.impl;
 
 import ite_istad_product.product_demo.advisor.ResourceAlreadyExistException;
-import ite_istad_product.product_demo.dto.CategoryRequest;
-import ite_istad_product.product_demo.dto.UpdateCategoryRequest;
-import ite_istad_product.product_demo.dto.CategoryResponse;
+import ite_istad_product.product_demo.dto.category.CategoryRequest;
+import ite_istad_product.product_demo.dto.category.UpdateCategoryRequest;
+import ite_istad_product.product_demo.dto.category.CategoryResponse;
 import ite_istad_product.product_demo.entity.Category;
 import ite_istad_product.product_demo.mapper.CategoryMapper;
 import ite_istad_product.product_demo.repository.CategoryRepositoryNew;

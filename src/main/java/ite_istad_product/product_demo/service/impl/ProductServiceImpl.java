@@ -1,11 +1,15 @@
 package ite_istad_product.product_demo.service.impl;
 
-import ite_istad_product.product_demo.dto.ProductRequest;
-import ite_istad_product.product_demo.dto.UpdateProductRequest;
-import ite_istad_product.product_demo.dto.ProductResponse;
+import ite_istad_product.product_demo.dto.product.ProductRequest;
+import ite_istad_product.product_demo.dto.product.UpdateProductRequest;
+import ite_istad_product.product_demo.dto.product.ProductResponse;
 import ite_istad_product.product_demo.entity.Product;
+import ite_istad_product.product_demo.entity.Tag;
 import ite_istad_product.product_demo.mapper.ProductMapper;
+import ite_istad_product.product_demo.repository.CategoryRepository;
+import ite_istad_product.product_demo.repository.CategoryRepositoryNew;
 import ite_istad_product.product_demo.repository.ProductRepository;
+import ite_istad_product.product_demo.repository.TagRepository;
 import ite_istad_product.product_demo.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,14 +30,32 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final CategoryRepositoryNew categoryRepositoryNew;
+    private final TagRepository tagRepository;
+
 
     @Override
     @Transactional
     public ProductResponse createProduct(ProductRequest productrequest) {
         Product product = productMapper.toEntity(productrequest);
+
+        ///  check if the catefory exists
+        var category = categoryRepositoryNew.findById(
+                productrequest.categoryId())
+                .orElseThrow(() -> new NoSuchElementException("Category with id = " +productrequest.categoryId()+"not found!!!"));
+        product.setCategory(category);
+
+        /// convert set < Integer to set<Tag></Tag>
+        if(productrequest.tagsIds() != null && !productrequest.tagsIds().isEmpty()) {
+            Set<Tag> tags = productrequest.tagsIds().stream()
+                    .map(tagId -> tagRepository.getReferenceById(tagId))
+                    .collect(Collectors.toSet());
+            product.setTags(tags);
+        }
+
+
         product.setUserId(1);
         Product savedProduct = productRepository.save(product);
-
         return productMapper.toProductResponse(savedProduct);
     }
 
