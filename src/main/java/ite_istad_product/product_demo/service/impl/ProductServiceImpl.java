@@ -7,7 +7,6 @@ import ite_istad_product.product_demo.entity.Product;
 import ite_istad_product.product_demo.entity.Tag;
 import ite_istad_product.product_demo.mapper.ProductMapper;
 import ite_istad_product.product_demo.repository.CategoryRepository;
-import ite_istad_product.product_demo.repository.CategoryRepositoryNew;
 import ite_istad_product.product_demo.repository.ProductRepository;
 import ite_istad_product.product_demo.repository.TagRepository;
 import ite_istad_product.product_demo.service.ProductService;
@@ -18,6 +17,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
+
 
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -30,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
-    private final CategoryRepositoryNew categoryRepositoryNew;
+    private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
 
 
@@ -40,7 +41,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productMapper.toEntity(productrequest);
 
         ///  check if the catefory exists
-        var category = categoryRepositoryNew.findById(
+        var category = categoryRepository.findById(
                 productrequest.categoryId())
                 .orElseThrow(() -> new NoSuchElementException("Category with id = " +productrequest.categoryId()+"not found!!!"));
         product.setCategory(category);
@@ -54,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
 
-        product.setUserId(1);
+        product.setId(1);
         Product savedProduct = productRepository.save(product);
         return productMapper.toProductResponse(savedProduct);
     }
@@ -97,8 +98,11 @@ public class ProductServiceImpl implements ProductService {
             existingProduct.setName(updateProductrequest.name());
         if(updateProductrequest.description() != null)
             existingProduct.setDescription(updateProductrequest.description());
-        if(updateProductrequest.price() != null)
-            existingProduct.setPrice(updateProductrequest.price());
+        if (updateProductrequest.price() != null) {
+            existingProduct.setPrice(
+                    BigDecimal.valueOf(updateProductrequest.price())
+            );
+        }
         Product updatedProduct = productRepository.save(existingProduct);
         return productMapper.toProductResponse(updatedProduct);
     }

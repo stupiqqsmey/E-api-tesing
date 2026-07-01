@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,8 +25,14 @@ public class Product {
     private Integer id;
     private String  name;
     private String  description;
-    private Double price;
-    private Integer userId;
+
+    /// for currency
+    private BigDecimal price;
+    private Boolean isavailable=true;
+    private Boolean isDeleted=false; /// for soft delete
+    private String slug; /// for seo purpose
+    private String thumbnail;
+    private Integer quantity;
 
 
     @ManyToMany
@@ -39,7 +46,5 @@ public class Product {
     @ManyToOne (fetch = FetchType.LAZY)  /// many to one is eiger
     @JoinColumn(name = "category_id")
     private Category category;
-
-
 }
 

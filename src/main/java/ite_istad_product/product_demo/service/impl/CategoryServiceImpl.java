@@ -6,7 +6,7 @@ import ite_istad_product.product_demo.dto.category.UpdateCategoryRequest;
 import ite_istad_product.product_demo.dto.category.CategoryResponse;
 import ite_istad_product.product_demo.entity.Category;
 import ite_istad_product.product_demo.mapper.CategoryMapper;
-import ite_istad_product.product_demo.repository.CategoryRepositoryNew;
+import ite_istad_product.product_demo.repository.CategoryRepository;
 import ite_istad_product.product_demo.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import java.util.NoSuchElementException;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryMapper categoryMapper;
-    private final CategoryRepositoryNew categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     @Transactional

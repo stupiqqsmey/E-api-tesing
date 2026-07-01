@@ -21,7 +21,7 @@ public class RestControllerAdvisor {
         var response = ErrorResponse.builder()
                         .message(ex.getMessage())
                         .timeStamp(LocalDateTime.now())
-                        .status(HttpStatus.CONTINUE.value())
+                        .status(HttpStatus.CONFLICT.value())
                         .build();
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
