@@ -26,7 +26,7 @@ public class Order {
     private String remarks;
     private BigDecimal discount ;
     private Boolean isDelete =false;
-    private LocalDateTime orderAt ;
+    private LocalDateTime orderedAt ;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

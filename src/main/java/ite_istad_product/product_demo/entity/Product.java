@@ -43,7 +43,7 @@ public class Product {
     )
     private Set<Tag> tags = new HashSet<>();
 
-    @ManyToOne (fetch = FetchType.LAZY)  /// many to one is eiger
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 }
