@@ -17,6 +17,14 @@ public class User {
     private String email;
     private String password;
 
+    private String username;
+    // must include this
+//    private String keycloakUserId;
+
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Profile profile;
+
+    @Column(unique = true, nullable = false)
+    private String keycloakId;
 }

@@ -16,6 +16,9 @@ public class Profile {
     private Integer id;
     private String url;
     private String bio;
+    private String firstName;
+    private String lastName;
+    private String gender;
 
     @OneToOne
     @JoinColumn(name = "user_id", unique = true, referencedColumnName = "id")

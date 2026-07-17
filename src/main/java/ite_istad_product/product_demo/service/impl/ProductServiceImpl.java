@@ -1,9 +1,11 @@
 package ite_istad_product.product_demo.service.impl;
 
+import ite_istad_product.product_demo.dto.product.ProductFilter;
 import ite_istad_product.product_demo.dto.product.ProductRequest;
-import ite_istad_product.product_demo.dto.product.UpdateProductRequest;
 import ite_istad_product.product_demo.dto.product.ProductResponse;
+import ite_istad_product.product_demo.dto.product.UpdateProductRequest;
 import ite_istad_product.product_demo.entity.Product;
+import ite_istad_product.product_demo.entity.ProductSpecification;
 import ite_istad_product.product_demo.entity.Tag;
 import ite_istad_product.product_demo.mapper.ProductMapper;
 import ite_istad_product.product_demo.repository.CategoryRepository;
@@ -13,107 +15,136 @@ import ite_istad_product.product_demo.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
-
-
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
+@Slf4j
+@Transactional
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final ProductMapper productMapper;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
-
+    private final ProductMapper productMapper;
 
     @Override
-    @Transactional
-    public ProductResponse createProduct(ProductRequest productrequest) {
-        Product product = productMapper.toEntity(productrequest);
+    public ProductResponse createProduct(ProductRequest request) {
 
-        ///  check if the catefory exists
-        var category = categoryRepository.findById(
-                productrequest.categoryId())
-                .orElseThrow(() -> new NoSuchElementException("Category with id = " +productrequest.categoryId()+"not found!!!"));
+        Product product = productMapper.toEntity(request);
+
+        var category = categoryRepository.findById(request.categoryId())
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "Category with id " + request.categoryId() + " not found."
+                        ));
+
         product.setCategory(category);
 
-        /// convert set < Integer to set<Tag></Tag>
-        if(productrequest.tagsIds() != null && !productrequest.tagsIds().isEmpty()) {
-            Set<Tag> tags = productrequest.tagsIds().stream()
-                    .map(tagId -> tagRepository.getReferenceById(tagId))
+        if (request.tagsIds() != null && !request.tagsIds().isEmpty()) {
+
+            Set<Tag> tags = request.tagsIds()
+                    .stream()
+                    .map(tagId ->
+                            tagRepository.findById(tagId)
+                                    .orElseThrow(() ->
+                                            new NoSuchElementException(
+                                                    "Tag with id " + tagId + " not found."
+                                            )))
                     .collect(Collectors.toSet());
+
             product.setTags(tags);
         }
 
-
-        product.setId(1);
         Product savedProduct = productRepository.save(product);
+
+        log.info("Product created successfully. ID={}", savedProduct.getId());
+
         return productMapper.toProductResponse(savedProduct);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductResponse> findAllProducts(int page, int size, String keyword) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Product> productPage;
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            productPage = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
-        } else {
-            productPage = productRepository.findAll(pageable);
-        }
+    public Page<ProductResponse> findAllProducts(Pageable pageable,
+                                                 ProductFilter filter) {
 
-        return productPage.map(productMapper::toProductResponse);
+        Specification<Product> specification =
+                ProductSpecification.filterProduct(filter);
+
+        return productRepository.findAll(specification, pageable)
+                .map(productMapper::toProductResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProductResponse findProductById(Integer id) {
-        Product product = productRepository.findById(id).orElse(null);
-        if(product == null) {
-            log.info("Product with id {} not found", id);
-            return null;
-        }
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Product with id {} not found.", id);
+                    return new NoSuchElementException(
+                            "Product with id " + id + " not found."
+                    );
+                });
+
         return productMapper.toProductResponse(product);
     }
 
     @Override
-    @Transactional
-    public ProductResponse updateProduct(Integer id, UpdateProductRequest updateProductrequest) {
-        Product existingProduct = productRepository.findById(id).orElse(null);
-        if(existingProduct == null) {
-            log.info("No product found with id " + id);
-            return null;
+    public ProductResponse updateProduct(Integer id,
+                                         UpdateProductRequest request) {
+
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Product with id {} not found.", id);
+                    return new NoSuchElementException(
+                            "Product with id " + id + " not found."
+                    );
+                });
+
+        if (request.name() != null) {
+            existingProduct.setName(request.name());
         }
 
-        if(updateProductrequest.name() != null)
-            existingProduct.setName(updateProductrequest.name());
-        if(updateProductrequest.description() != null)
-            existingProduct.setDescription(updateProductrequest.description());
-        if (updateProductrequest.price() != null) {
+        if (request.description() != null) {
+            existingProduct.setDescription(request.description());
+        }
+
+        if (request.price() != null) {
             existingProduct.setPrice(
-                    BigDecimal.valueOf(updateProductrequest.price())
+                    BigDecimal.valueOf(request.price())
             );
         }
+
         Product updatedProduct = productRepository.save(existingProduct);
+
+        log.info("Product updated successfully. ID={}", updatedProduct.getId());
+
         return productMapper.toProductResponse(updatedProduct);
     }
 
     @Override
-    @Transactional
-    public Boolean deleteProduct(Integer id) {
-        if(productRepository.existsById(id)) {
-            productRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public void deleteProduct(Integer id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Product with id {} not found.", id);
+                    return new NoSuchElementException(
+                            "Product with id " + id + " not found."
+                    );
+                });
+
+        productRepository.delete(product);
+
+        log.info("Product deleted successfully. ID={}", id);
     }
+
 }

@@ -1,3 +1,20 @@
+server:
+  port: 8080
+
+file:
+  client-path: /file
+  storage-location: "D:\\ITE\\BackEnd\\fileupload"
+  base-url: http://localhost:${server.port}${file.client-path}/
+
+# ==========================
+# Keycloak Configuration
+# ==========================
+keycloak:
+  server-url: http://localhost:9999
+  realm: spring-app-realm
+  client-id: spring-boot-app
+  client-secret: ouC3elygmvW8Bv3YYisjFMz58toq1rHc
+
 spring:
   application:
     name: product-demo
@@ -15,7 +32,14 @@ spring:
     properties:
       hibernate:
         format_sql: true
-#  security:
-#    user:
-#      name: developer
-#      password: secure1122
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9999/realms/spring-app-realm

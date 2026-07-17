@@ -3,8 +3,10 @@ package ite_istad_product.product_demo.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @Entity
 @Table(name = "files_tbl")
 @AllArgsConstructor

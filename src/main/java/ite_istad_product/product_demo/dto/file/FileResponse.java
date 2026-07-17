@@ -9,6 +9,7 @@ public record FileResponse(
         String caption,
         String extension,
         Long size,
+        String mediaType,
         String url
         ) {
 }

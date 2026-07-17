@@ -11,29 +11,50 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
 
     @Override
     public UserResponse createUser(CreateUserRequest request) {
+
         var user = userMapper.toEntity(request);
         var profile = new Profile();
 
         profile.setBio(request.bio());
         profile.setUrl(request.url());
+
+        // Link Profile <-> User
         profile.setUser(user);
         user.setProfile(profile);
+
         return userMapper.toResponse(userRepository.save(user));
     }
-   @Override
+
+    @Override
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
-                .stream().map(userMapper::toResponse)
+                .stream()
+                .map(userMapper::toResponse)
                 .toList();
+    }
+
+    @Override
+    public UserResponse getUserByKeycloakId(String keycloakId) {
+
+        return userMapper.toResponse(
+                userRepository.findByKeycloakId(keycloakId)
+                        .orElseThrow(() ->
+                                new NoSuchElementException(
+                                        "User not found with id: " + keycloakId
+                                )
+                        )
+        );
     }
 }
